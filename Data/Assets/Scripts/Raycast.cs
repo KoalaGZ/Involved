@@ -7,7 +7,11 @@ public class Raycast : MonoBehaviour {
     private GameObject raycastedObj;
 
     [SerializeField] private LayerMask layerMaskInteract;
-    [SerializeField] private int rayLength = 10;
+    [SerializeField] private int rayLength = 1;
+    [SerializeField] Material material1;
+    [SerializeField] Material material2;
+
+    public Material tempMaterial = null;
 
     // Update is called once per frame
     void Update () {
@@ -21,13 +25,35 @@ public class Raycast : MonoBehaviour {
         if (Physics.Raycast(transform.position, forward, out hit, rayLength, layerMaskInteract.value ))
         {
             theDistance = hit.distance; 
-            if (hit.collider.CompareTag("Interact"))
+            if (hit.collider.CompareTag("Interact") )
             {
-                raycastedObj = hit.collider.gameObject;
+                if(raycastedObj == null)
+                {
+                    raycastedObj = hit.collider.gameObject;
+                    tempMaterial = hit.collider.GetComponent<MeshRenderer>().sharedMaterial;
+                    hit.collider.GetComponent<MeshRenderer>().sharedMaterial = material2;
+                }
+                else if(raycastedObj != hit.collider.gameObject)
+                {
+                    
+                    raycastedObj.GetComponent<MeshRenderer>().sharedMaterial = tempMaterial;
+                    raycastedObj = null;
+                }
                 
-
                 Debug.LogFormat("Distance: {0} ObjectName: {1}", theDistance, raycastedObj);
             }
+            else if(raycastedObj != null)
+            {
+                
+                raycastedObj.GetComponent<MeshRenderer>().sharedMaterial = tempMaterial;
+                raycastedObj = null;
+            }
         }
-	}
+        else if (raycastedObj != null)
+        {
+            
+            raycastedObj.GetComponent<MeshRenderer>().sharedMaterial = tempMaterial;
+            raycastedObj = null;
+        }
+    }
 }
